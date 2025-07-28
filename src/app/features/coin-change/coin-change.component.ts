@@ -18,6 +18,10 @@ import { MatList, MatListItem } from '@angular/material/list';
 import { CoinChangeResult } from './models/coin-change';
 import { CustomValidators } from '../../shared/validators/custom-validators';
 import { CommonModule } from '@angular/common';
+import {
+  getRandomCoinPreset,
+  parseCoinDenominations,
+} from './helpers/coin-change.helpers';
 
 @Component({
   selector: 'app-coin-change',
@@ -42,16 +46,23 @@ import { CommonModule } from '@angular/common';
 export class CoinChangeComponent {
   public result: CoinChangeResult | null = null;
 
-  public readonly coinForm = this.fb.group({
-    amount: ['', [CustomValidators.noWhiteSpace]],
+  public readonly coinForm = this.formBuilder.group({
+    amount: [
+      null,
+      [
+        CustomValidators.noWhiteSpace,
+        Validators.pattern(/^\d+$/),
+        Validators.min(1),
+      ],
+    ],
     denominations: [
       '',
-      [Validators.required, Validators.pattern(/^(\d+)(,\d+)*$/)],
+      [CustomValidators.noWhiteSpace, Validators.pattern(/^(\d+)(,\d+)*$/)],
     ],
   }) as FormGroup;
 
   constructor(
-    private fb: FormBuilder,
+    private formBuilder: FormBuilder,
     private coinChangeService: CoinChangeService,
   ) {}
 
@@ -60,43 +71,24 @@ export class CoinChangeComponent {
 
     const amount = this.coinForm.value.amount;
     const denominationsInput = this.coinForm.value.denominations;
-    const coins = this.parseDenominations(denominationsInput);
-
-    if (!coins.length) {
-      alert('Please enter valid coin denominations.');
-      return;
-    }
+    const coins = parseCoinDenominations(denominationsInput);
 
     this.result = this.coinChangeService.calculateGreedy(amount, coins);
+
+    if (this.result.totalCoins === 0) {
+      alert('Неможливо підібрати комбінацію монет для цієї суми.');
+      this.result = null;
+    }
   }
 
   public generateRandomExample(): void {
     const randomAmount = Math.floor(Math.random() * 91) + 10;
-    const presetDenominations = [
-      [1, 5, 10, 25],
-      [1, 2, 5],
-      [1, 3, 4],
-      [1, 7, 10],
-    ];
-
-    const randomSet =
-      presetDenominations[
-        Math.floor(Math.random() * presetDenominations.length)
-      ];
 
     this.coinForm.setValue({
       amount: randomAmount,
-      denominations: randomSet.join(','),
+      denominations: getRandomCoinPreset().join(','),
     });
 
     this.submit();
-  }
-
-  private parseDenominations(input: string): number[] {
-    return input
-      .split(',')
-      .map((s) => parseInt(s.trim(), 10))
-      .filter((n) => !isNaN(n) && n > 0)
-      .sort((a, b) => b - a);
   }
 }

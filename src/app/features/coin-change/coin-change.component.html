@@ -1,65 +1,68 @@
 <div class="container">
-  <h3>💰 Coin Change Calculator</h3>
+  <h3>💰 Калькулятор розміну монет</h3>
 
   <form [formGroup]="coinForm" (ngSubmit)="submit()" class="coin-form">
     <mat-form-field appearance="outline">
-      <mat-label>Amount</mat-label>
+      <mat-label>Сума</mat-label>
       <input
         matInput
         type="text"
         formControlName="amount"
-        placeholder="Enter amount (e.g. 67)"
+        maxlength="15"
+        placeholder="Введіть суму (наприклад, 67)"
       />
 
       @if (coinForm.get("amount")?.hasError("required")) {
-        <mat-error> This field is required </mat-error>
+        <mat-error>Це поле обов’язкове</mat-error>
+      } @else if (coinForm.get("amount")?.hasError("pattern")) {
+        <mat-error>Має бути ціле число</mat-error>
+      } @else if (coinForm.get("amount")?.hasError("min")) {
+        <mat-error>Сума має бути більшою за нуль</mat-error>
       }
     </mat-form-field>
 
     <mat-form-field appearance="outline">
-      <mat-label>Coin Denominations</mat-label>
+      <mat-label>Номінали монет</mat-label>
       <input
         matInput
         type="text"
         formControlName="denominations"
-        placeholder="E.g. 1,5,10,25"
+        placeholder="Приклад: 1,5,10,25"
       />
       @if (coinForm.get("denominations")?.hasError("required")) {
-        <mat-error> This field is required </mat-error>
+        <mat-error>Це поле обов’язкове</mat-error>
       } @else if (coinForm.get("denominations")?.hasError("pattern")) {
-        <mat-error>
-          Please enter numbers separated by commas (e.g. 1,5,10)
-        </mat-error>
+        <mat-error>Введіть значення у форматі 1,5,10</mat-error>
       }
     </mat-form-field>
 
     <div class="button-group">
-      <button mat-flat-button type="submit">🧮 Calculate</button>
+      <button mat-flat-button type="submit">🧮 Обчислити</button>
       <button
         mat-stroked-button
         type="button"
         (click)="generateRandomExample()"
       >
-        🎲 Random Example
+        🎲 Випадковий приклад
       </button>
     </div>
   </form>
 
   @if (result) {
     <div class="result">
-      <p class="result-title">Result:</p>
+      <p class="result-title">Результат:</p>
 
       <ul>
         @for (coin of result.breakdown; track coin) {
           <li>
-            <span class="coin">{{ coin.count }}</span> {{ coin.count }} ×
-            {{ coin.coin }}
+            {{ coin.count }} монет{{ coin.count > 1 ? "и" : "а" }} ×
+            {{ coin.coin }} = {{ coin.coin * coin.count }}
           </li>
         }
       </ul>
 
       <p class="total-coins">
-        <strong>Total Coins:</strong> {{ result.totalCoins }}
+        <strong>Загальна кількість монет:</strong> {{ result.totalCoins }}
       </p>
     </div>
   }
