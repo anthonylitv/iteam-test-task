@@ -1,0 +1,52 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.coin-form {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.button-group {
+  display: flex;
+  gap: 10px;
+}
+
+ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 0;
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+}
+
+.result {
+}
+
+.coin {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background-color: orange;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  font-size: 12px;
+  line-height: 0;
+}
+
+.result-title {
+  font-weight: bold;
+}
