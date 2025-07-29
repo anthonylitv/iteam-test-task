@@ -1,0 +1,14 @@
+<p class="result-title">Результат:</p>
+
+<ul>
+  @for (coin of result.breakdown; track coin) {
+    <li>
+      {{ coin.count }} монет{{ coin.count > 1 ? "и" : "а" }} × {{ coin.coin }} =
+      {{ coin.coin * coin.count }}
+    </li>
+  }
+</ul>
+
+<p class="total-coins">
+  <strong>Загальна кількість монет:</strong> {{ result.totalCoins }}
+</p>

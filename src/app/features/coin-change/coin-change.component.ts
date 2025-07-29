@@ -1,6 +1,5 @@
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { CoinChangeService } from './services/coin-change.service';
-import { MatCard, MatCardTitle } from '@angular/material/card';
 import {
   FormBuilder,
   FormGroup,
@@ -14,7 +13,6 @@ import {
   MatLabel,
 } from '@angular/material/input';
 import { MatButton } from '@angular/material/button';
-import { MatList, MatListItem } from '@angular/material/list';
 import { CoinChangeResult } from './models/coin-change';
 import { CustomValidators } from '../../shared/validators/custom-validators';
 import { CommonModule } from '@angular/common';
@@ -22,44 +20,42 @@ import {
   getRandomCoinPreset,
   parseCoinDenominations,
 } from './helpers/coin-change.helpers';
+import { CoinChangeResultComponent } from './components/coin-change-result/coin-change-result.component';
+import { CoinChangeInfoButtonComponent } from './components/coin-change-info-button/coin-change-info-button.component';
 
 @Component({
   selector: 'app-coin-change',
   imports: [
     CommonModule,
-    MatCard,
-    MatCardTitle,
     MatFormField,
     ReactiveFormsModule,
     MatInput,
     MatFormField,
     MatButton,
-    MatListItem,
-    MatList,
     MatLabel,
     MatError,
+    CoinChangeResultComponent,
+    CoinChangeInfoButtonComponent,
   ],
   templateUrl: './coin-change.component.html',
   styleUrl: './coin-change.component.scss',
   providers: [CoinChangeService],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CoinChangeComponent {
   public result: CoinChangeResult | null = null;
 
   public readonly coinForm = this.formBuilder.group({
-    amount: [
-      null,
-      [
-        CustomValidators.noWhiteSpace,
-        Validators.pattern(/^\d+$/),
-        Validators.min(1),
-      ],
-    ],
-    denominations: [
-      '',
-      [CustomValidators.noWhiteSpace, Validators.pattern(/^(\d+)(,\d+)*$/)],
-    ],
-  }) as FormGroup;
+    amount: this.formBuilder.control<number | null>(null, [
+      CustomValidators.noWhiteSpace,
+      Validators.pattern(/^\d+$/),
+      Validators.min(1),
+    ]),
+    denominations: this.formBuilder.control<string>('', [
+      CustomValidators.noWhiteSpace,
+      Validators.pattern(/^(\d+)(,\d+)*$/),
+    ]),
+  });
 
   constructor(
     private formBuilder: FormBuilder,
@@ -71,9 +67,9 @@ export class CoinChangeComponent {
 
     const amount = this.coinForm.value.amount;
     const denominationsInput = this.coinForm.value.denominations;
-    const coins = parseCoinDenominations(denominationsInput);
+    const coins = parseCoinDenominations(denominationsInput!);
 
-    this.result = this.coinChangeService.calculateGreedy(amount, coins);
+    this.result = this.coinChangeService.calculateGreedy(amount!, coins);
 
     if (this.result.totalCoins === 0) {
       alert('Неможливо підібрати комбінацію монет для цієї суми.');

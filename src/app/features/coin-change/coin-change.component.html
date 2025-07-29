@@ -5,18 +5,18 @@
     <mat-form-field appearance="outline">
       <mat-label>Сума</mat-label>
       <input
+        [formControl]="coinForm.controls.amount"
         matInput
-        type="text"
-        formControlName="amount"
         maxlength="15"
+        type="text"
         placeholder="Введіть суму (наприклад, 67)"
       />
 
-      @if (coinForm.get("amount")?.hasError("required")) {
+      @if (coinForm.controls.amount.hasError("required")) {
         <mat-error>Це поле обов’язкове</mat-error>
-      } @else if (coinForm.get("amount")?.hasError("pattern")) {
+      } @else if (coinForm.controls.amount.hasError("pattern")) {
         <mat-error>Має бути ціле число</mat-error>
-      } @else if (coinForm.get("amount")?.hasError("min")) {
+      } @else if (coinForm.controls.amount.hasError("min")) {
         <mat-error>Сума має бути більшою за нуль</mat-error>
       }
     </mat-form-field>
@@ -24,14 +24,14 @@
     <mat-form-field appearance="outline">
       <mat-label>Номінали монет</mat-label>
       <input
+        [formControl]="coinForm.controls.denominations"
         matInput
         type="text"
-        formControlName="denominations"
         placeholder="Приклад: 1,5,10,25"
       />
-      @if (coinForm.get("denominations")?.hasError("required")) {
+      @if (coinForm.controls.denominations.hasError("required")) {
         <mat-error>Це поле обов’язкове</mat-error>
-      } @else if (coinForm.get("denominations")?.hasError("pattern")) {
+      } @else if (coinForm.controls.denominations.hasError("pattern")) {
         <mat-error>Введіть значення у форматі 1,5,10</mat-error>
       }
     </mat-form-field>
@@ -49,21 +49,8 @@
   </form>
 
   @if (result) {
-    <div class="result">
-      <p class="result-title">Результат:</p>
-
-      <ul>
-        @for (coin of result.breakdown; track coin) {
-          <li>
-            {{ coin.count }} монет{{ coin.count > 1 ? "и" : "а" }} ×
-            {{ coin.coin }} = {{ coin.coin * coin.count }}
-          </li>
-        }
-      </ul>
-
-      <p class="total-coins">
-        <strong>Загальна кількість монет:</strong> {{ result.totalCoins }}
-      </p>
-    </div>
+    <app-coin-change-result [result]="result"></app-coin-change-result>
   }
 </div>
+
+<app-coin-change-info-button></app-coin-change-info-button>
